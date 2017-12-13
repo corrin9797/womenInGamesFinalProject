@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class gameControllerScript : MonoBehaviour {
     //Variables for testing purposes. If you're reading this, that means I forgot to edit it out.
@@ -9,7 +10,7 @@ public class gameControllerScript : MonoBehaviour {
 
     //Which phase of the game is active - "setup," "action," and "resolve"
     public static string phase = "setup";
-    int turnsTaken = 0;
+    public int turnsTaken = 0;
 
     //[x,y] x==0 at left and y==0 at bottom
     public static GameObject[,] tileArray = new GameObject[8, 5];
@@ -18,7 +19,7 @@ public class gameControllerScript : MonoBehaviour {
     public GameObject cubePrefab;
     GameObject currentCube;
 
-    public float score = 0f;
+    public static float score = 0f;
     public int combo = 1;
 
     //Pushers
@@ -297,7 +298,22 @@ public class gameControllerScript : MonoBehaviour {
                 if (MatchCheckUp(x, y) - 1 > y)
                 {
                     int tempY = MatchCheckUp(x, y);
-                    score += ((tempY - 1) - y);
+                    float scoreToAdd= ((tempY - 1) - y);
+                    if (lootOne != null)
+                    {
+                        if (lootOne.GetComponent<Renderer>().material.color == grid[x, y].GetComponent<Renderer>().material.color)
+                        {
+                            scoreToAdd = scoreToAdd * 1.1f;
+                        }
+                    }
+                    if (lootTwo != null)
+                    {
+                        if (lootTwo.GetComponent<Renderer>().material.color == grid[x, y].GetComponent<Renderer>().material.color)
+                        {
+                            scoreToAdd = scoreToAdd * 1.1f;
+                        }
+                    }
+                    score += scoreToAdd;
                     while (tempY >= y)
                     {
 
@@ -318,7 +334,22 @@ public class gameControllerScript : MonoBehaviour {
                 if (MatchCheckRight(x, y) - 1 > x)
                 {
                     int tempX = MatchCheckRight(x, y);
-                    score += ((tempX - 1) - x);
+                    float scoreToAdd = ((tempX - 1) - x);
+                    if (lootOne != null)
+                    {
+                        if (lootOne.GetComponent<Renderer>().material.color == grid[x, y].GetComponent<Renderer>().material.color)
+                        {
+                            scoreToAdd = scoreToAdd * 1.1f;
+                        }
+                    }
+                    if (lootTwo != null)
+                    {
+                        if (lootTwo.GetComponent<Renderer>().material.color == grid[x, y].GetComponent<Renderer>().material.color)
+                        {
+                            scoreToAdd = scoreToAdd * 1.1f;
+                        }
+                    }
+                    score += scoreToAdd;
                     while (tempX >= x)
                     {
 
@@ -567,7 +598,7 @@ public class gameControllerScript : MonoBehaviour {
     }
     IEnumerator TurnCoroutine()
     {
-        phase = "destroy";
+        phase = "action";
         yield return new WaitForSeconds(4);
         phase = "resolve";
         push(pusherOne);
@@ -601,12 +632,27 @@ public class gameControllerScript : MonoBehaviour {
         pushers[0] = pusherOne;
         pushers[1] = pusherTwo;
         turnsTaken++;
+        
         phase = "setup";
         print(score);
+        if (turnsTaken > 14)
+        {
+            SceneManager.LoadScene("endScene");
+        }
 
     }
 
     
+
+    void OnGUI()
+    {
+        GUI.Box(new Rect(4, 4, 100, 25), "Score: "+score);
+        if (phase == "action")
+        {
+            print("moo");
+            GUI.Box(new Rect(250, 4, 270, 25), "You may click cubes to destroy them");
+        }
+    }
 
     // Update is called once per frame
     void Update () {

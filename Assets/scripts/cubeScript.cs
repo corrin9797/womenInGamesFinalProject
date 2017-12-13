@@ -13,7 +13,7 @@ public class cubeScript : MonoBehaviour {
 	
     void OnMouseDown()
     {
-        if (gameControllerScript.phase == "destroy")
+        if (gameControllerScript.phase == "action")
         {
             
             Destroy(this.gameObject);
